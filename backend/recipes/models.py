@@ -8,12 +8,11 @@ User = get_user_model()
 class Ingredient(models.Model):
     name = models.CharField(max_length=256)
     unit = models.CharField(max_length=64)
-    count = models.PositiveIntegerField()
 
     class Meta:
         verbose_name = 'ингридиент'
         verbose_name_plural = 'ингридиенты'
-        ordering = ['-count']
+        ordering = ['-name']
 
     def __str__(self):
         return '{}, {}'.format(self.name, self.unit)
@@ -62,11 +61,9 @@ class Recipe(models.Model):
         Ingredient,
         through='IngredientRecipe'
     )
-    tags = models.ManyToManyField( # изменить связь, т.к. позволяет выбрать только один тег (сдеалать как IngredientRecipe)
+    tags = models.ManyToManyField(
         Tag,
-        related_name='recipes',
-        blank=True,
-        help_text='Выберите один или несколько жанров'
+        related_name='recipes'
     )
 
     class Meta:
@@ -75,7 +72,7 @@ class Recipe(models.Model):
         ordering = ['-pub_date']
 
     def __str__(self) -> str:
-        return self.text[:15]
+        return self.title
 
 
 class IngredientRecipe(models.Model):
@@ -89,7 +86,18 @@ class IngredientRecipe(models.Model):
 
 
 class FavoriteRecipe(models.Model):
-    pass
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorite'
+    )
+    recipe = models.ManyToManyField(
+        Recipe,
+        related_name='favorite'
+    )
+
+    class Meta:
+        verbose_name = 'список избранных'
 
 
 class Follow(models.Model):
@@ -110,3 +118,8 @@ class Follow(models.Model):
 
     def __str__(self) -> str:
         return '{} подписался на {}'.format(self.user, self.following)
+
+'''
+class Cart(models.Model):
+    pass
+'''
