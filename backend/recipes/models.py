@@ -98,6 +98,7 @@ class FavoriteRecipe(models.Model):
 
     class Meta:
         verbose_name = 'список избранных'
+        verbose_name_plural = 'список избранных'
 
 
 class Follow(models.Model):
@@ -119,7 +120,22 @@ class Follow(models.Model):
     def __str__(self) -> str:
         return '{} подписался на {}'.format(self.user, self.following)
 
-'''
+
 class Cart(models.Model):
-    pass
-'''
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='cart'
+    )
+    recipe = models.ManyToManyField(
+        Recipe,
+        related_name='cart'
+    )
+
+    class Meta:
+        verbose_name = 'Корзина'
+        verbose_name_plural = 'Корзина'
+
+    def get_list(self):
+        return self.recipe.count()
+

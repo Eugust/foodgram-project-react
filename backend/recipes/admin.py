@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
 from .models import (Ingredient, Recipe, IngredientRecipe,
-                     Tag, Follow, FavoriteRecipe)
+                     Tag, Follow, FavoriteRecipe, Cart)
 
 
 class RecipeIngredientLine(admin.TabularInline):
@@ -18,6 +18,11 @@ class RecipeTagLine(admin.TabularInline):
 
 class FavoriteRecipeLine(admin.TabularInline):
     model = FavoriteRecipe.recipe.through
+    extra = 1
+
+
+class CartLine(admin.TabularInline):
+    model = Cart.recipe.through
     extra = 1
 
 
@@ -54,6 +59,13 @@ class FollowAdmin(admin.ModelAdmin):
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('user',)
     inlines = (FavoriteRecipeLine,)
+    exclude = ('recipe',)
+
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'get_list')
+    inlines = (CartLine,)
     exclude = ('recipe',)
 
 

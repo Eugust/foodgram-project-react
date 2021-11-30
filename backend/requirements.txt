@@ -4,3 +4,5 @@ markdown
 django-filter
 django-colorfield
 pillow
+djangorestframework-simplejwt
+djoser
