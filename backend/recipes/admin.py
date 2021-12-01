@@ -1,6 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
 
 from .models import (Ingredient, Recipe, IngredientRecipe,
                      Tag, Follow, FavoriteRecipe, Cart)
@@ -24,10 +22,6 @@ class FavoriteRecipeLine(admin.TabularInline):
 class CartLine(admin.TabularInline):
     model = Cart.recipe.through
     extra = 1
-
-
-class MyUserAdmin(UserAdmin):
-    list_filter = ('username', 'email')
 
 
 @admin.register(Recipe)
@@ -64,11 +58,8 @@ class FavoriteAdmin(admin.ModelAdmin):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('user', 'get_list')
+    list_display = ('user',  'get_list')
     inlines = (CartLine,)
-    exclude = ('recipe',)
 
 
 # admin.site.register(IngredientRecipe)
-admin.site.unregister(User)
-admin.site.register(User, MyUserAdmin)
