@@ -42,9 +42,9 @@ INSTALLED_APPS = [
     'colorfield',
     'rest_framework',
     'djoser',
+    'users',
     'recipes',
     'api',
-    'users',
 ]
 
 AUTH_USER_MODEL = 'users.User'

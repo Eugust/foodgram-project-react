@@ -67,6 +67,8 @@ class Recipe(models.Model):
         Tag,
         related_name='recipes'
     )
+    is_favorited = models.BooleanField(default=False)
+    is_in_shopping_cart = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'рецепт'
