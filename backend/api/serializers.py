@@ -31,15 +31,40 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        source='ingredient.id',
+        queryset=Ingredient.objects.all()
+    )
+    name = serializers.StringRelatedField(
+        source='ingredient.name'
+    )
+    unit = serializers.StringRelatedField(
+        source='ingredient.unit'
+    )
+
     class Meta:
-        fields = '__all__'
-        model = Ingredient
+        fields = (
+            'id',
+            'name',
+            'unit',
+            'value'
+        )
+        model = IngredientRecipe
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(read_only=True, many=True)
-    author = UserSerializer(read_only=True)
-    ingredients = IngredientSerializer(read_only=True, many=True)
+    tags = TagSerializer(
+        read_only=True,
+        many=True
+    )
+    author = UserSerializer(
+        read_only=True
+    )
+    ingredients = IngredientSerializer(
+        read_only=True,
+        many=True,
+        source='related_ingredient'
+    )
 
     class Meta:
         model = Recipe

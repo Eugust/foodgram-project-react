@@ -60,6 +60,7 @@ class FavoriteAdmin(admin.ModelAdmin):
 class CartAdmin(admin.ModelAdmin):
     list_display = ('user',  'get_list')
     inlines = (CartLine,)
+    exclude = ('recipe',)
 
 
 # admin.site.register(IngredientRecipe)

@@ -80,8 +80,15 @@ class Recipe(models.Model):
 
 
 class IngredientRecipe(models.Model):
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='related_ingredient'
+    )
     value = models.PositiveIntegerField()
 
     class Meta:
@@ -141,5 +148,8 @@ class Cart(models.Model):
         verbose_name_plural = 'Корзина'
 
     def get_list(self):
-        return self.recipe.count()
+        total = 0
+        for recipe in self.recipe.all():
+            total += recipe.ingredients.count()
+        return total
 
