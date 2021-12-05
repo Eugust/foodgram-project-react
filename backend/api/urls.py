@@ -3,7 +3,7 @@ from rest_framework.routers import SimpleRouter
 
 from .views import (RecipeViewSet, TagViewSet, FavoriteRecipeViewSet,
                     FollowViewSet, IngredientViewSet)
-from users.views import UserViewSet
+from users.views import UserViewSet, login
 
 router = SimpleRouter()
 router.register(
@@ -38,5 +38,6 @@ router.register(
 )
 
 urlpatterns = [
+    path('auth/token/login/', login, name='login'),
     path('', include(router.urls)),
 ]

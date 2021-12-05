@@ -15,3 +15,20 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'is_subscribed'
         )
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        required=True,
+    )
+    email = serializers.EmailField(
+        required=True
+    )
+
+
+    class Meta:
+        model = User
+        fields = (
+            'password',
+            'email'
+        )
