@@ -10,8 +10,7 @@ class UserAdmin(admin.ModelAdmin):
         'username',
         'first_name',
         'last_name',
-        'email',
-        'is_subscribed',
+        'email'
     )
     list_filter = (
         'username',

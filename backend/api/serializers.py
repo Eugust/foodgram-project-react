@@ -3,19 +3,7 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import (Ingredient, Recipe, IngredientRecipe,
                             Tag, Follow, FavoriteRecipe, User)
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed'
-        )
+from users.serializers import UserSerializer
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -83,18 +71,12 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(
-        slug_field='username',
-        default=serializers.CurrentUserDefault(),
-        queryset=User.objects.all()
-    )
-    following = serializers.SlugRelatedField(
-        slug_field='username',
-        queryset=User.objects.all()
+    following = UserSerializer(
+        read_only=True
     )
 
     class Meta:
-        fields = '__all__'
+        fields = ('following',)
         model = Follow
         validators = [
             UniqueTogetherValidator(

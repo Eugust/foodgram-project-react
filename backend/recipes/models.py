@@ -150,6 +150,6 @@ class Cart(models.Model):
     def get_list(self):
         total = 0
         for recipe in self.recipe.all():
-            total += recipe.ingredients.count()
+            total += recipe.related_ingredient.count()
         return total
 
