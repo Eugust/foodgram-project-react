@@ -32,3 +32,12 @@ class SignUpSerializer(serializers.ModelSerializer):
             'password',
             'email'
         )
+
+
+class SetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(
+        required=True,
+    )
+    current_password = serializers.CharField(
+        required=True
+    )
