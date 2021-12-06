@@ -8,6 +8,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from .serializers import UserSerializer, SignUpSerializer, SetPasswordSerializer
 from .models import User
+from recipes.models import Follow
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -33,6 +34,12 @@ class UserViewSet(viewsets.ModelViewSet):
             user.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['get'], detail=False, url_path='subscriptions', url_name='subscriptions')
+    def subscriptions(self, request, *args, **kwargs):
+        sub = get_object_or_404(Follow, user=self.request.user)
+        serializer = UserSerializer(sub.following)
+        return Response(serializer.data, status=status.HTTP_200_OK)
             
 
 

@@ -21,11 +21,13 @@ router.register(
     FavoriteRecipeViewSet,
     basename='favorite'
 )
+'''
 router.register(
     r'users/subscriptions',
     FollowViewSet,
     basename='follow'
 )
+'''
 router.register(
     r'ingredients',
     IngredientViewSet,

@@ -129,8 +129,7 @@ class Follow(models.Model):
         verbose_name_plural = 'Подписки'
 
     def __str__(self) -> str:
-        return '{} подписался на {}'.format(self.user, self.following)
-
+        return '{} subscribe to {}'.format(self.user, self.following)
 
 class Cart(models.Model):
     user = models.ForeignKey(
