@@ -6,3 +6,4 @@ django-colorfield
 pillow
 djangorestframework-simplejwt
 djoser
+reportlab
