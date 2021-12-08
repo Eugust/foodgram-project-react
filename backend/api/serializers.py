@@ -14,7 +14,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class FavoriteRecipeSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = '__all__'
+        fields = ('user', 'recipe')
         model = FavoriteRecipe
 
 

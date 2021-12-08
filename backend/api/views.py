@@ -2,7 +2,8 @@ import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
 
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import (IsAuthenticated,
@@ -23,35 +24,36 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(methods=['get'], detail=False, url_path='download_shopping_cart', url_name='download_shopping_cart')
+    @action(methods=['get'], detail=False,
+            url_path='download_shopping_cart',
+            url_name='download_shopping_cart')
     def download_shopping_cart(self, request, *args, **kwargs):
         buffer = io.BytesIO()
-
         p = canvas.Canvas(buffer)
-
-        p.drawString(100, 100, "Hello world.")
-
+        #p.drawString(100, 100, "Hello world.")
+        p.drawRightString(100, 100, "Hello world.")
         p.showPage()
         p.save()
-
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
+        return FileResponse(buffer, as_attachment=True, filename='Список покупок.pdf')
+    
+    @action(methods=['get', 'delete'], detail=False,
+            url_path=r'(?P<id>\d+)/favorite')
+    def favorite(self, request, id=None):
+        user = get_object_or_404(User, id=request.user.id)
+        recipe = get_object_or_404(Recipe, id=self.kwargs.get('id'))
+        if request.method == 'GET':
+            serializer = FavoriteRecipeSerializer(data={'user': user.id, 'recipe': recipe.id})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     http_method_names = ['get']
-
-
-class FavoriteRecipeViewSet(viewsets.ModelViewSet):
-    queryset = FavoriteRecipe.objects.all()
-    serializer_class = FavoriteRecipeSerializer
-    http_method_names = ['get', 'delete']
-
-    def perform_create(self, serializer):
-        recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
-        serializer.save(user=self.request.user, recipe=recipe)
 
 
 class FollowViewSet(viewsets.ModelViewSet):

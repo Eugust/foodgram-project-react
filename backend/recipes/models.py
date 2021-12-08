@@ -102,8 +102,9 @@ class FavoriteRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='favorite'
     )
-    recipe = models.ManyToManyField(
+    recipe = models.ForeignKey(
         Recipe,
+        on_delete=models.CASCADE,
         related_name='favorite'
     )
 
