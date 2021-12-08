@@ -11,7 +11,7 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.pagination import PageNumberPagination
 
 from .serializers import (RecipeSerializer, TagSerializer, FavoriteRecipeSerializer,
-                          FollowSerializer, IngredientSerializer)
+                          FollowSerializer, IngredientSerializer, FavoriteAndCartSerializer)
 from recipes.models import Recipe, Tag, FavoriteRecipe, Follow, Ingredient
 from users.models import User
 
@@ -39,14 +39,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
     
     @action(methods=['get', 'delete'], detail=False,
             url_path=r'(?P<id>\d+)/favorite')
-    def favorite(self, request, id=None):
+    def favorite(self, request, id=None, **kwargs):
         user = get_object_or_404(User, id=request.user.id)
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('id'))
         if request.method == 'GET':
-            serializer = FavoriteRecipeSerializer(data={'user': user.id, 'recipe': recipe.id})
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            favorite_serializer = FavoriteRecipeSerializer(data={'user': user.id, 'recipe': recipe.id})
+            favorite_serializer.is_valid(raise_exception=True)
+            favorite_serializer.save()
+            serializer = FavoriteAndCartSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        elif request.method == 'DELETE':
+            favorite = get_object_or_404(FavoriteRecipe, user=user, recipe=recipe)
+            favorite.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 

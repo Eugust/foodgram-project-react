@@ -17,6 +17,29 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
         fields = ('user', 'recipe')
         model = FavoriteRecipe
 
+        validators = [
+            UniqueTogetherValidator(
+                queryset=FavoriteRecipe.objects.all(),
+                fields=('user', 'recipe')
+            )
+        ]
+
+
+class FavoriteAndCartSerializer(serializers.ModelSerializer):
+    # image = serializers.SerializerMethodField('get_image')
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'title',
+            'image',
+            'cooking_time'
+        )
+    '''
+    def get_image(self, obj):
+        return obj.image.url
+    '''
 
 class IngredientSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
