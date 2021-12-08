@@ -32,7 +32,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         buffer = io.BytesIO()
         p = canvas.Canvas(buffer)
         #p.drawString(100, 100, "Hello world.")
-        p.drawRightString(100, 100, "Hello world.")
+        user = get_object_or_404(User, id=request.user.id)
+        cart = Cart.objects.filter(user=user).all()
+        list_of_ingredients = ''
+        for recipe in cart:
+            print(recipe.recipe.ingredients)
+            list_of_ingredients += f'{recipe.recipe.title}'
+        p.drawRightString(100, 100, f'{list_of_ingredients}')
         p.showPage()
         p.save()
         buffer.seek(0)
