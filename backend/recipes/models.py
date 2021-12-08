@@ -67,8 +67,6 @@ class Recipe(models.Model):
         Tag,
         related_name='recipes'
     )
-    is_favorited = models.BooleanField(default=False)
-    is_in_shopping_cart = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'рецепт'
@@ -96,7 +94,7 @@ class IngredientRecipe(models.Model):
         verbose_name_plural = 'ингридиенты для рецепта'
 
 
-class FavoriteRecipe(models.Model):
+class Favorite(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -105,12 +103,35 @@ class FavoriteRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='favorite'
     )
+    is_favorited = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'список избранных'
         verbose_name_plural = 'список избранных'
+
+
+class Cart(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='cart'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+    )
+    is_in_shopping_cart = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'Корзина'
+        verbose_name_plural = 'Корзина'
+
+    def get_list(self):
+        total = 0
+        for recipe in self.recipe.all():
+            total += recipe.related_ingredient.count()
+        return total
 
 
 class Follow(models.Model):
@@ -131,26 +152,3 @@ class Follow(models.Model):
 
     def __str__(self) -> str:
         return '{} subscribe to {}'.format(self.user, self.following)
-
-class Cart(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='cart'
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        related_name='cart'
-    )
-
-    class Meta:
-        verbose_name = 'Корзина'
-        verbose_name_plural = 'Корзина'
-
-    def get_list(self):
-        total = 0
-        for recipe in self.recipe.all():
-            total += recipe.related_ingredient.count()
-        return total
-

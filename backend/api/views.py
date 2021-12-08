@@ -10,10 +10,10 @@ from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.pagination import PageNumberPagination
 
-from .serializers import (RecipeSerializer, TagSerializer, FavoriteRecipeSerializer,
+from .serializers import (RecipeSerializer, TagSerializer, FavoriteSerializer,
                           FollowSerializer, IngredientSerializer, FavoriteAndCartSerializer,
                           CartSerializer)
-from recipes.models import Recipe, Tag, FavoriteRecipe, Follow, Ingredient, Cart
+from recipes.models import Recipe, Tag, Favorite, Follow, Ingredient, Cart
 from users.models import User
 
 
@@ -50,13 +50,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = get_object_or_404(User, id=request.user.id)
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('id'))
         if request.method == 'GET':
-            favorite_serializer = FavoriteRecipeSerializer(data={'user': user.id, 'recipe': recipe.id})
+            favorite_serializer = FavoriteSerializer(data={'user': user.id, 'recipe': recipe.id})
             favorite_serializer.is_valid(raise_exception=True)
             favorite_serializer.save()
             serializer = FavoriteAndCartSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == 'DELETE':
-            favorite = get_object_or_404(FavoriteRecipe, user=user, recipe=recipe)
+            favorite = get_object_or_404(Favorite, user=user, recipe=recipe)
             favorite.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 

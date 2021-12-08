@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import (Ingredient, Recipe, IngredientRecipe,
-                            Tag, Follow, FavoriteRecipe, User, Cart)
+                            Tag, Follow, Favorite, User, Cart)
 from users.serializers import UserSerializer
 
 
@@ -12,14 +12,14 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
 
 
-class FavoriteRecipeSerializer(serializers.ModelSerializer):
+class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('user', 'recipe')
-        model = FavoriteRecipe
+        model = Favorite
 
         validators = [
             UniqueTogetherValidator(
-                queryset=FavoriteRecipe.objects.all(),
+                queryset=Favorite.objects.all(),
                 fields=('user', 'recipe')
             )
         ]
