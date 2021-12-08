@@ -14,11 +14,6 @@ class RecipeTagLine(admin.TabularInline):
     extra = 1
 
 
-class CartLine(admin.TabularInline):
-    model = Cart.recipe.through
-    extra = 1
-
-
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('title', 'author')
@@ -51,9 +46,7 @@ class FavoriteAdmin(admin.ModelAdmin):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('user',  'get_list')
-    inlines = (CartLine,)
-    exclude = ('recipe',)
+    list_display = ('user', 'recipe')
 
 
 # admin.site.register(IngredientRecipe)

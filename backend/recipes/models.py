@@ -138,8 +138,9 @@ class Cart(models.Model):
         on_delete=models.CASCADE,
         related_name='cart'
     )
-    recipe = models.ManyToManyField(
+    recipe = models.ForeignKey(
         Recipe,
+        on_delete=models.CASCADE,
         related_name='cart'
     )
 

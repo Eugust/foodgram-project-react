@@ -11,8 +11,9 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.pagination import PageNumberPagination
 
 from .serializers import (RecipeSerializer, TagSerializer, FavoriteRecipeSerializer,
-                          FollowSerializer, IngredientSerializer, FavoriteAndCartSerializer)
-from recipes.models import Recipe, Tag, FavoriteRecipe, Follow, Ingredient
+                          FollowSerializer, IngredientSerializer, FavoriteAndCartSerializer,
+                          CartSerializer)
+from recipes.models import Recipe, Tag, FavoriteRecipe, Follow, Ingredient, Cart
 from users.models import User
 
 
@@ -51,6 +52,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
         elif request.method == 'DELETE':
             favorite = get_object_or_404(FavoriteRecipe, user=user, recipe=recipe)
             favorite.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=['get', 'delete'], detail=False,
+            url_path=r'(?P<id>\d+)/shopping_cart')
+    def shopping_cart(self, request, id=None, *args, **kwargs):
+        user = get_object_or_404(User, id=request.user.id)
+        recipe = get_object_or_404(Recipe, id=self.kwargs.get('id'))
+        if request.method == 'GET':
+            shop_serializer = CartSerializer(data={'user': user.id, 'recipe': recipe.id})
+            shop_serializer.is_valid(raise_exception=True)
+            shop_serializer.save()
+            serializer = FavoriteAndCartSerializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        elif request.method == 'DELETE':
+            cart = get_object_or_404(Cart, user=user, recipe=recipe)
+            cart.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
