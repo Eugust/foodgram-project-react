@@ -36,7 +36,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         cart = Cart.objects.filter(user=user).all()
         list_of_ingredients = ''
         for recipe in cart:
-            print(recipe.recipe.ingredients)
+            print(recipe.recipe.related_ingredient.name)
             list_of_ingredients += f'{recipe.recipe.title}'
         p.drawRightString(100, 100, f'{list_of_ingredients}')
         p.showPage()
