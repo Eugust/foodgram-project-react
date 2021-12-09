@@ -1,13 +1,16 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from recipes.models import Follow
+from recipes.models import Follow, Recipe
 
 User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField(
+        read_only=True
+    )
+    recipes_count = serializers.SerializerMethodField(
         read_only=True
     )
 
@@ -19,7 +22,8 @@ class UserSerializer(serializers.ModelSerializer):
             'username',
             'first_name',
             'last_name',
-            'is_subscribed'
+            'is_subscribed',
+            'recipes_count'
         )
 
     def get_is_subscribed(self, obj):
@@ -28,6 +32,12 @@ class UserSerializer(serializers.ModelSerializer):
         if request and user.is_authenticated:
             return Follow.objects.filter(user=user).exists()
         return False
+
+    def get_recipes_count(self, obj):
+        user = self.context['request'].user
+        author = Follow.objects.filter(user=user).get('author')
+        recipes_count = Recipe.objects.filter(author=author).count()
+        return recipes_count
 
 
 class SignUpSerializer(serializers.ModelSerializer):
