@@ -1,10 +1,16 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from recipes.models import Follow
+
 User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField(
+        read_only=True
+    )
+
     class Meta:
         model = User
         fields = (
@@ -15,6 +21,13 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'is_subscribed'
         )
+
+    def get_is_subscribed(self, obj):
+        request = self.context['request']
+        user = self.context['request'].user
+        if request and user.is_authenticated:
+            return Follow.objects.filter(user=user).exists()
+        return False
 
 
 class SignUpSerializer(serializers.ModelSerializer):

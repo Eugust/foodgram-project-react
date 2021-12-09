@@ -11,9 +11,9 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.pagination import PageNumberPagination
 
 from .serializers import (RecipeSerializer, TagSerializer, FavoriteSerializer,
-                          FollowSerializer, IngredientSerializer, FavoriteAndCartSerializer,
+                          IngredientSerializer, FavoriteAndCartSerializer,
                           CartSerializer)
-from recipes.models import Recipe, Tag, Favorite, Follow, Ingredient, Cart
+from recipes.models import Recipe, Tag, Favorite, Ingredient, Cart
 from users.models import User
 
 
@@ -82,21 +82,6 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     http_method_names = ['get']
-
-
-class FollowViewSet(viewsets.ModelViewSet):
-    queryset = Follow.objects.all()
-    serializer_class = FollowSerializer
-    pagination_class = PageNumberPagination
-    http_method_names = ['get', 'delete']
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-    
-    def get_queryset(self):
-        user = get_object_or_404(User, username=self.request.user.username)
-        following = Follow.objects.filter(user=user).all()
-        return following
 
 
 class IngredientViewSet(viewsets.ModelViewSet):

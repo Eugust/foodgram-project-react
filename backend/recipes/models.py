@@ -104,7 +104,6 @@ class Favorite(models.Model):
         Recipe,
         on_delete=models.CASCADE,
     )
-    is_favorited = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'список избранных'
@@ -121,7 +120,6 @@ class Cart(models.Model):
         Recipe,
         on_delete=models.CASCADE,
     )
-    is_in_shopping_cart = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Корзина'

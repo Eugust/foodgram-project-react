@@ -76,6 +76,12 @@ class RecipeSerializer(serializers.ModelSerializer):
         many=True,
         source='related_ingredient'
     )
+    is_favorited = serializers.SerializerMethodField(
+        read_only=True
+    )
+    is_in_shopping_cart = serializers.SerializerMethodField(
+        read_only=True
+    )
 
     class Meta:
         model = Recipe
@@ -91,15 +97,25 @@ class RecipeSerializer(serializers.ModelSerializer):
             'description',
             'cooking_time'
         )
+    
+    def get_is_favorited(self, obj):
+        request = self.context['request']
+        user = self.context['request'].user
+        if request and user.is_authenticated:
+            return Favorite.objects.filter(user=user).exists()
+        return False
+    
+    def get_is_in_shopping_cart(self, obj):
+        request = self.context['request']
+        user = self.context['request'].user
+        if request and user.is_authenticated:
+            return Cart.objects.filter(user=user).exists()
+        return False
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    following = UserSerializer(
-        read_only=True
-    )
-
     class Meta:
-        fields = ('following',)
+        fields = ('user', 'following')
         model = Follow
         validators = [
             UniqueTogetherValidator(

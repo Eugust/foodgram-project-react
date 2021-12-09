@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 
 from .views import (RecipeViewSet, TagViewSet,
-                    FollowViewSet, IngredientViewSet)
+                    IngredientViewSet)
 from users.views import UserViewSet, login
 
 router = SimpleRouter()
@@ -16,13 +16,6 @@ router.register(
     RecipeViewSet,
     basename='recipes'
 )
-'''
-router.register(
-    r'users/subscriptions',
-    FollowViewSet,
-    basename='follow'
-)
-'''
 router.register(
     r'ingredients',
     IngredientViewSet,
