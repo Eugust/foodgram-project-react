@@ -12,6 +12,16 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
 
 
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            'id',
+            'name',
+            'measurement_unit'
+        )
+        model = Ingredient
+
+
 class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('user', 'recipe')
@@ -41,7 +51,7 @@ class FavoriteAndCartSerializer(serializers.ModelSerializer):
         return obj.image.url
     '''
 
-class IngredientSerializer(serializers.ModelSerializer):
+class IngredientRecipeSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         source='ingredient.id',
         queryset=Ingredient.objects.all()
@@ -49,15 +59,15 @@ class IngredientSerializer(serializers.ModelSerializer):
     name = serializers.StringRelatedField(
         source='ingredient.name'
     )
-    unit = serializers.StringRelatedField(
-        source='ingredient.unit'
+    measurement_unit = serializers.StringRelatedField(
+        source='ingredient.measurement_unit'
     )
 
     class Meta:
         fields = (
             'id',
             'name',
-            'unit',
+            'measurement_unit',
             'value'
         )
         model = IngredientRecipe
@@ -71,7 +81,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = UserSerializer(
         read_only=True
     )
-    ingredients = IngredientSerializer(
+    ingredients = IngredientRecipeSerializer(
         read_only=True,
         many=True,
         source='related_ingredient'

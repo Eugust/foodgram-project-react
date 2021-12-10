@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from recipes.models import Follow, Recipe
@@ -10,9 +11,40 @@ class UserSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField(
         read_only=True
     )
+    
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+        )
+
+    def get_is_subscribed(self, obj):
+        request = self.context['request']
+        user = self.context['request'].user
+        if request and user.is_authenticated:
+            return Follow.objects.filter(user=user).exists()
+        return False
+
+
+class SubscribeSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField(
+        read_only=True
+    )
     recipes_count = serializers.SerializerMethodField(
         read_only=True
     )
+    '''
+    recipes = RecipeShortInfoSerializer(
+        read_only=True
+    )
+    '''
+    
 
     class Meta:
         model = User
@@ -35,9 +67,18 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, obj):
         user = self.context['request'].user
-        author = Follow.objects.filter(user=user).get('author')
+        follow_obj = get_object_or_404(Follow, user=user)
+        author = follow_obj.following
         recipes_count = Recipe.objects.filter(author=author).count()
         return recipes_count
+'''
+    def get_recipes(self, obj):
+        user = self.context['request'].user
+        follow_obj = get_object_or_404(Follow, user=user)
+        author = follow_obj.following
+        recipes = Recipe.objects.filter(author=author)
+        return recipes
+'''
 
 
 class SignUpSerializer(serializers.ModelSerializer):

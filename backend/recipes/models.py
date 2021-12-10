@@ -9,7 +9,7 @@ User = get_user_model()
 
 class Ingredient(models.Model):
     name = models.CharField(max_length=256)
-    unit = models.CharField(max_length=64)
+    measurement_unit = models.CharField(max_length=64)
 
     class Meta:
         verbose_name = 'ингридиент'
@@ -17,7 +17,7 @@ class Ingredient(models.Model):
         ordering = ['-name']
 
     def __str__(self):
-        return '{}, {}'.format(self.name, self.unit)
+        return '{}, {}'.format(self.name, self.measurement_unit)
 
 
 class Tag(models.Model):

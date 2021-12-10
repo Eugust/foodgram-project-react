@@ -6,7 +6,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework_simplejwt.tokens import AccessToken
 
-from .serializers import UserSerializer, SignUpSerializer, SetPasswordSerializer
+from .serializers import (UserSerializer, SignUpSerializer,
+                          SetPasswordSerializer, SubscribeSerializer)
 from .models import User
 from recipes.models import Follow
 from api.serializers import FollowSerializer
@@ -46,7 +47,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
         '''
         sub = get_object_or_404(Follow, user=self.request.user)
-        serializer = UserSerializer(sub.following, context={'request': request})
+        serializer = SubscribeSerializer(sub.following, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
         '''
         '''
@@ -60,7 +61,7 @@ class UserViewSet(viewsets.ModelViewSet):
             subscribe_serializer = FollowSerializer(data={'user': user.id, 'following': following.id})
             subscribe_serializer.is_valid(raise_exception=True)
             subscribe_serializer.save()
-            serializer = UserSerializer(following, context={'request': request})
+            serializer = SubscribeSerializer(following, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == 'DELETE':
             subscribe = get_object_or_404(Follow, user=user)
