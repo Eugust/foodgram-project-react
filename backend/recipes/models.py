@@ -14,7 +14,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'ингридиент'
         verbose_name_plural = 'ингридиенты'
-        ordering = ['-name']
+        ordering = ['name']
 
     def __str__(self):
         return '{}, {}'.format(self.name, self.measurement_unit)
