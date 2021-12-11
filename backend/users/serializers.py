@@ -39,7 +39,7 @@ class RecipeShortInfoSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = (
             'id',
-            'title',
+            'name',
             'image',
             'cooking_time'
         )

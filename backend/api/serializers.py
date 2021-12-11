@@ -42,7 +42,7 @@ class FavoriteAndCartSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = (
             'id',
-            'title',
+            'name',
             'image',
             'cooking_time'
         )
@@ -102,9 +102,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             'ingredients',
             'is_favorited',
             'is_in_shopping_cart',
-            'title',
+            'name',
             'image',
-            'description',
+            'text',
             'cooking_time'
         )
     

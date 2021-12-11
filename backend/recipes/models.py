@@ -51,13 +51,13 @@ class Recipe(models.Model):
         'Дата публикации',
         auto_now_add=True
     )
-    title = models.CharField(max_length=256)
+    name = models.CharField(max_length=256)
     image = models.ImageField(
         upload_to='recipes/',
         null=True,
         blank = True
     )
-    description = models.TextField()
+    text = models.TextField()
     cooking_time = models.PositiveIntegerField()
     ingredients = models.ManyToManyField(
         Ingredient,

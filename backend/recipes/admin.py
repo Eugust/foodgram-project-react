@@ -16,8 +16,8 @@ class RecipeTagLine(admin.TabularInline):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author')
-    list_filter = ('author', 'title', 'tags')
+    list_display = ('name', 'author')
+    list_filter = ('author', 'name', 'tags')
     inlines = (RecipeIngredientLine, RecipeTagLine, )
     exclude = ('tags',)
 
