@@ -32,6 +32,23 @@ class UserSerializer(serializers.ModelSerializer):
         return False
 
 
+class RecipeShortInfoSerializer(serializers.ModelSerializer):
+    # image = serializers.SerializerMethodField('get_image')
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'title',
+            'image',
+            'cooking_time'
+        )
+    '''
+    def get_image(self, obj):
+        return obj.image.url
+    '''
+
+
 class SubscribeSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField(
         read_only=True
@@ -39,15 +56,10 @@ class SubscribeSerializer(serializers.ModelSerializer):
     recipes_count = serializers.SerializerMethodField(
         read_only=True
     )
-    recipes = serializers.StringRelatedField(
+    recipes = RecipeShortInfoSerializer(
         read_only=True,
         many=True
     )
-    '''
-    recipes = RecipeShortInfoSerializer(
-        read_only=True
-    )
-    '''
     
 
     class Meta:
