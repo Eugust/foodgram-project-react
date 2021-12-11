@@ -40,17 +40,13 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False,
             url_path='subscriptions', url_name='subscriptions')
     def subscriptions(self, request, *args, **kwargs):
-        '''
-        subs = Follow.objects.filter(user=self.request.user)
-        for sub in subs:
-            serializer = UserSerializer(sub.following)
+        queryset = User.objects.filter(following__user=request.user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = SubscribeSerializer(queryset, context={'request': request}, many=True)
+            self.get_paginated_response(serializer.data)
+        serializer = SubscribeSerializer(queryset, context={'request': request}, many=True)    
         return Response(serializer.data, status=status.HTTP_200_OK)
-        '''
-        sub = get_object_or_404(Follow, user=self.request.user)
-        serializer = SubscribeSerializer(sub.following, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-        '''
-        '''
 
     @action(methods=['get', 'delete'], detail=False,
             url_path=r'(?P<id>\d+)/subscribe')
@@ -68,7 +64,6 @@ class UserViewSet(viewsets.ModelViewSet):
             subscribe.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
-            
 
 
 @api_view(['POST'])

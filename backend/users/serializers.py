@@ -39,6 +39,10 @@ class SubscribeSerializer(serializers.ModelSerializer):
     recipes_count = serializers.SerializerMethodField(
         read_only=True
     )
+    recipes = serializers.StringRelatedField(
+        read_only=True,
+        many=True
+    )
     '''
     recipes = RecipeShortInfoSerializer(
         read_only=True
@@ -55,6 +59,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
+            'recipes',
             'recipes_count'
         )
 
@@ -71,14 +76,14 @@ class SubscribeSerializer(serializers.ModelSerializer):
         author = follow_obj.following
         recipes_count = Recipe.objects.filter(author=author).count()
         return recipes_count
-'''
+
     def get_recipes(self, obj):
         user = self.context['request'].user
         follow_obj = get_object_or_404(Follow, user=user)
         author = follow_obj.following
-        recipes = Recipe.objects.filter(author=author)
+        recipes = Recipe.objects.filter(author=author).all()
         return recipes
-'''
+
 
 
 class SignUpSerializer(serializers.ModelSerializer):
