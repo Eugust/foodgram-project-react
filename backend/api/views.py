@@ -31,14 +31,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request, *args, **kwargs):
         buffer = io.BytesIO()
         p = canvas.Canvas(buffer)
-        #p.drawString(100, 100, "Hello world.")
         user = get_object_or_404(User, id=request.user.id)
-        cart = Cart.objects.filter(user=user).all()
+        all_carts = Cart.objects.filter(user=user).all()
+        ingredients = dict()
+        for cart in all_carts:
+            for ingredient in list(cart.recipe.related_ingredient.all()):
+                if ingredient.ingredient not in ingredients:
+                    ingredients[ingredient.ingredient] = ingredient.value
+                else:
+                    ingredients[ingredient.ingredient] += ingredient.value
         list_of_ingredients = ''
-        for recipe in cart:
-            print(recipe.recipe.related_ingredient.name)
-            list_of_ingredients += f'{recipe.recipe.title}'
-        p.drawRightString(100, 100, f'{list_of_ingredients}')
+        for key, value in ingredients.items():
+            list_of_ingredients += f'\n{key}: {value}'
+        p.drawRightString(200, 200, list_of_ingredients)
         p.showPage()
         p.save()
         buffer.seek(0)
