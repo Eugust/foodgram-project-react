@@ -35,7 +35,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'тег'
         verbose_name_plural = 'теги'
-        ordering = ('-id', )
+        ordering = ('id', )
 
     def __str__(self) -> str:
         return '{}'.format(self.name)
@@ -74,7 +74,7 @@ class Recipe(models.Model):
         ordering = ['-pub_date']
 
     def __str__(self) -> str:
-        return self.title
+        return self.name
 
 
 class IngredientRecipe(models.Model):
