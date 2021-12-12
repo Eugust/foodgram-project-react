@@ -6,7 +6,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.permissions import (IsAuthenticated,
+from rest_framework.permissions import (IsAuthenticated, AllowAny,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.pagination import PageNumberPagination
 
@@ -21,13 +21,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     pagination_class = PageNumberPagination
+    permission_classes = [IsAuthenticatedOrReadOnly,]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
     @action(methods=['get'], detail=False,
             url_path='download_shopping_cart',
-            url_name='download_shopping_cart')
+            url_name='download_shopping_cart',
+            permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request, *args, **kwargs):
         buffer = io.BytesIO()
         p = canvas.Canvas(buffer)
@@ -50,7 +52,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return FileResponse(buffer, as_attachment=True, filename='Список покупок.pdf')
     
     @action(methods=['get', 'delete'], detail=False,
-            url_path=r'(?P<id>\d+)/favorite')
+            url_path=r'(?P<id>\d+)/favorite',
+            permission_classes=[IsAuthenticated])
     def favorite(self, request, id=None, **kwargs):
         user = get_object_or_404(User, id=request.user.id)
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('id'))
@@ -66,7 +69,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['get', 'delete'], detail=False,
-            url_path=r'(?P<id>\d+)/shopping_cart')
+            url_path=r'(?P<id>\d+)/shopping_cart',
+            permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, id=None, *args, **kwargs):
         user = get_object_or_404(User, id=request.user.id)
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('id'))
@@ -87,6 +91,7 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
+    permission_classes = [AllowAny,]
     http_method_names = ['get']
 
 
@@ -94,4 +99,5 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
+    permission_classes = [AllowAny,]
     http_method_names = ['get']
