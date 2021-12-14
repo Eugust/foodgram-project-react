@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from recipes.models import Follow, Recipe
 
+
 User = get_user_model()
 
 
@@ -33,7 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class RecipeShortInfoSerializer(serializers.ModelSerializer):
-    # image = serializers.SerializerMethodField('get_image')
+    image = serializers.SerializerMethodField('get_image')
 
     class Meta:
         model = Recipe
@@ -43,10 +44,10 @@ class RecipeShortInfoSerializer(serializers.ModelSerializer):
             'image',
             'cooking_time'
         )
-    '''
+
     def get_image(self, obj):
         return obj.image.url
-    '''
+
 
 
 class SubscribeSerializer(serializers.ModelSerializer):

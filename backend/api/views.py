@@ -1,6 +1,6 @@
 import io
-from django.http import FileResponse
-from reportlab.pdfgen import canvas
+import csv
+from django.http import HttpResponse
 
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -12,8 +12,8 @@ from rest_framework.pagination import PageNumberPagination
 
 from .serializers import (RecipeSerializer, TagSerializer, FavoriteSerializer,
                           IngredientSerializer, FavoriteAndCartSerializer,
-                          CartSerializer)
-from recipes.models import Recipe, Tag, Favorite, Ingredient, Cart
+                          CartSerializer, IngredientRecipeSerializer)
+from recipes.models import Recipe, Tag, Favorite, Ingredient, Cart, IngredientRecipe
 from users.models import User
 
 
@@ -31,8 +31,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             url_name='download_shopping_cart',
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request, *args, **kwargs):
-        buffer = io.BytesIO()
-        p = canvas.Canvas(buffer)
+        response = HttpResponse(
+            content_type='text/csv',
+            headers={'Content-Disposition': 'attachment; "filename=shoppinglist.csv"'},
+        )
         user = get_object_or_404(User, id=request.user.id)
         all_carts = Cart.objects.filter(user=user).all()
         ingredients = dict()
@@ -42,14 +44,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     ingredients[ingredient.ingredient] = ingredient.value
                 else:
                     ingredients[ingredient.ingredient] += ingredient.value
-        list_of_ingredients = ''
-        for key, value in ingredients.items():
-            list_of_ingredients += f'\n{key}: {value}'
-        p.drawRightString(200, 200, list_of_ingredients)
-        p.showPage()
-        p.save()
-        buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='Список покупок.pdf')
+
+        writer = csv.writer(response)
+        for ingredient, amount in ingredients.items():
+            writer.writerow([f'{ingredient}', f'{amount}'])
+        return response
     
     @action(methods=['get', 'delete'], detail=False,
             url_path=r'(?P<id>\d+)/favorite',
@@ -84,6 +83,26 @@ class RecipeViewSet(viewsets.ModelViewSet):
             cart = get_object_or_404(Cart, user=user, recipe=recipe)
             cart.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=['post', 'delete'], detail=False,
+            url_path=r'(?P<id>\d+)/add_ingredient',
+            permission_classes=[IsAuthenticated])
+    def add_ingredient(self, requset, id=None, *args, **kwargs):
+        user = get_object_or_404(User, id=request.user.id)
+        recipe = get_object_or_404(Recipe, id=self.kwargs.get('id'))
+        if user == recipe.author:
+            if request.method == 'POST':
+                serializer = IngredientRecipeSerializer(data=self.request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            elif request.method == 'DELETE':
+                ingredient = get_object_or_404(IngredientRecipe, recipe=recipe)
+                ingredient.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(status=status.HTTP_423_LOCKED)
 
 
 

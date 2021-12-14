@@ -36,7 +36,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 
 class FavoriteAndCartSerializer(serializers.ModelSerializer):
-    # image = serializers.SerializerMethodField('get_image')
+    image = serializers.SerializerMethodField('get_image')
 
     class Meta:
         model = Recipe
@@ -46,10 +46,10 @@ class FavoriteAndCartSerializer(serializers.ModelSerializer):
             'image',
             'cooking_time'
         )
-    '''
+    
     def get_image(self, obj):
         return obj.image.url
-    '''
+    
 
 class IngredientRecipeSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
