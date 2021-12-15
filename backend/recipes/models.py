@@ -1,9 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
-
 from colorfield.fields import ColorField
-
 
 User = get_user_model()
 
@@ -56,10 +54,12 @@ class Recipe(models.Model):
     image = models.ImageField(
         upload_to='recipes/',
         null=True,
-        blank = True
+        blank=True
     )
     text = models.TextField()
-    cooking_time = models.PositiveIntegerField(validators=[MinValueValidator(0)])
+    cooking_time = models.PositiveIntegerField(
+        validators=[MinValueValidator(0)]
+    )
     ingredients = models.ManyToManyField(
         Ingredient,
         through='IngredientRecipe'
