@@ -1,4 +1,5 @@
 import csv
+
 from django.http import HttpResponse
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -32,7 +33,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         response = HttpResponse(
             content_type='text/csv',
             headers={
-                'Content-Disposition': 'attachment; "filename=shoppinglist.csv"'
+                'Content-Disposition': 'attachment; "filename=shoplist.csv"'
             },
         )
         user = get_object_or_404(User, id=request.user.id)
