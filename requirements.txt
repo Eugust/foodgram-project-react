@@ -8,3 +8,4 @@ djangorestframework-simplejwt
 djoser
 reportlab
 pytest
+flake8

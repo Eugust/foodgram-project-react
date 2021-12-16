@@ -2,7 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework_simplejwt.tokens import AccessToken
 
@@ -17,7 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
-    permission_classes = [IsAuthenticatedOrReadOnly,]
+    permission_classes = [IsAuthenticatedOrReadOnly, ]
 
     @action(methods=['get'], detail=False,
             url_path='me', url_name='me',
@@ -33,7 +34,6 @@ class UserViewSet(viewsets.ModelViewSet):
     def set_password(self, request, *args, **kwargs):
         serializer = SetPasswordSerializer(data=self.request.data)
         new_password = self.request.data.get('new_password')
-        current_password = self.request.data.get('current_password')
         if serializer.is_valid():
             user = get_object_or_404(User, pk=self.request.user.id)
             user.password = new_password
@@ -48,9 +48,17 @@ class UserViewSet(viewsets.ModelViewSet):
         queryset = User.objects.filter(following__user=request.user)
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = SubscribeSerializer(queryset, context={'request': request}, many=True)
+            serializer = SubscribeSerializer(
+                queryset,
+                context={'request': request},
+                many=True
+            )
             self.get_paginated_response(serializer.data)
-        serializer = SubscribeSerializer(queryset, context={'request': request}, many=True)    
+        serializer = SubscribeSerializer(
+            queryset,
+            context={'request': request},
+            many=True
+        )    
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=['get', 'delete'], detail=False,
@@ -60,10 +68,15 @@ class UserViewSet(viewsets.ModelViewSet):
         user = get_object_or_404(User, id=request.user.id)
         following = get_object_or_404(User, id=self.kwargs.get('id'))
         if request.method == 'GET':
-            subscribe_serializer = FollowSerializer(data={'user': user.id, 'following': following.id})
+            subscribe_serializer = FollowSerializer(
+                data={'user': user.id, 'following': following.id}
+            )
             subscribe_serializer.is_valid(raise_exception=True)
             subscribe_serializer.save()
-            serializer = SubscribeSerializer(following, context={'request': request})
+            serializer = SubscribeSerializer(
+                following,
+                context={'request': request}
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == 'DELETE':
             subscribe = get_object_or_404(Follow, user=user)
@@ -77,11 +90,13 @@ class UserViewSet(viewsets.ModelViewSet):
 def login(request):
     serializer = SignUpSerializer(data=request.data)
     email = request.data.get('email')
-    password = request.data.get('password')
     if serializer.is_valid():
         user = get_object_or_404(User, email=email)
         if user:
             token = AccessToken.for_user(user)
-            return Response({'auth_token': f'{token}'}, status=status.HTTP_200_OK)
+            return Response(
+                {'auth_token': f'{token}'},
+                status=status.HTTP_200_OK
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

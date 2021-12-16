@@ -12,7 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField(
         read_only=True
     )
-    
 
     class Meta:
         model = User
@@ -49,7 +48,6 @@ class RecipeShortInfoSerializer(serializers.ModelSerializer):
         return obj.image.url
 
 
-
 class SubscribeSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField(
         read_only=True
@@ -62,7 +60,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
         many=True
     )
     
-
     class Meta:
         model = User
         fields = (
@@ -98,7 +95,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
         return recipes
 
 
-
 class SignUpSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         required=True,
@@ -106,7 +102,6 @@ class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True
     )
-
 
     class Meta:
         model = User

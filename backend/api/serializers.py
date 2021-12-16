@@ -1,8 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-
 from recipes.models import (Ingredient, Recipe, IngredientRecipe,
-                            Tag, Follow, Favorite, User, Cart)
+                            Tag, Follow, Favorite, Cart)
 from users.serializers import UserSerializer
 
 
@@ -46,10 +45,10 @@ class FavoriteAndCartSerializer(serializers.ModelSerializer):
             'image',
             'cooking_time'
         )
-    
+
     def get_image(self, obj):
         return obj.image.url
-    
+
 
 class IngredientRecipeSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
@@ -107,14 +106,14 @@ class RecipeSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time'
         )
-    
+
     def get_is_favorited(self, obj):
         request = self.context['request']
         user = self.context['request'].user
         if request and user.is_authenticated:
             return Favorite.objects.filter(user=user).exists()
         return False
-    
+
     def get_is_in_shopping_cart(self, obj):
         request = self.context['request']
         user = self.context['request'].user
@@ -141,7 +140,6 @@ class FollowSerializer(serializers.ModelSerializer):
                 "Нельзя подписываться на себя!"
             )
         return data
-
 
 
 class CartSerializer(serializers.ModelSerializer):

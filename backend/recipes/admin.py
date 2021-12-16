@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import (Ingredient, Recipe,
                      Tag, Follow, Favorite, Cart)
 
+
 class RecipeIngredientLine(admin.TabularInline):
     model = Recipe.ingredients.through
     extra = 1
