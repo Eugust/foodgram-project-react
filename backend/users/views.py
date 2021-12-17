@@ -34,11 +34,14 @@ class UserViewSet(viewsets.ModelViewSet):
     def set_password(self, request, *args, **kwargs):
         serializer = SetPasswordSerializer(data=self.request.data)
         new_password = self.request.data.get('new_password')
+        current_password = self.request.get('current_password')
         if serializer.is_valid():
             user = get_object_or_404(User, pk=self.request.user.id)
-            user.password = new_password
-            user.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            if user.password == current_password:
+                user.password = new_password
+                user.save()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['get'], detail=False,
@@ -90,13 +93,14 @@ class UserViewSet(viewsets.ModelViewSet):
 def login(request):
     serializer = SignUpSerializer(data=request.data)
     email = request.data.get('email')
+    password = request.data.get('password')
     if serializer.is_valid():
         user = get_object_or_404(User, email=email)
-        if user:
+        if user and user.password == password:
             token = AccessToken.for_user(user)
             return Response(
                 {'auth_token': f'{token}'},
                 status=status.HTTP_200_OK
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,3 +1,4 @@
+asgiref==3.3.2
 Django==3.2.7
 djangorestframework
 markdown
@@ -9,3 +10,8 @@ djoser
 reportlab
 pytest
 flake8
+gunicorn==20.0.4
+psycopg2-binary==2.8.6
+PyJWT==2.1.0
+pytz==2020.1
+sqlparse==0.3.1 
