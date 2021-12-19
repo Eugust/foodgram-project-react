@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.decorators import action, api_view, permission_classes
-#from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.authtoken.models import Token
 
 from .serializers import (UserSerializer, SignUpSerializer,
@@ -39,8 +38,8 @@ class UserViewSet(viewsets.ModelViewSet):
         current_password = self.request.data.get('current_password')
         if serializer.is_valid():
             user = get_object_or_404(User, pk=self.request.user.id)
-            if user.password == current_password:
-                user.password = new_password
+            if user.check_password(current_password):
+                user.set_password(new_password)
                 user.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -104,3 +103,14 @@ def login(request):
             )
         return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    user = get_object_or_404(User, pk=request.user.id)
+    if user is not None:
+        token = Token.objects.get(user=user)
+        token.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(status=status.HTTP_401_UNAUTHORIZED)
