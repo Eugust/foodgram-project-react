@@ -3,8 +3,7 @@ from django.contrib.auth.hashers import check_password
 from rest_framework import viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (AllowAny, IsAuthenticated)
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.authtoken.models import Token
 
@@ -84,7 +83,7 @@ class UserViewSet(viewsets.ModelViewSet):
             subscribe = get_object_or_404(Follow, user=user)
             subscribe.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])
@@ -92,7 +91,6 @@ class UserViewSet(viewsets.ModelViewSet):
 def login(request):
     serializer = SignUpSerializer(data=request.data)
     email = request.data.get('email')
-    password = request.data.get('password')
     if serializer.is_valid():
         user = get_object_or_404(User, email=email)
         if user:
