@@ -7,11 +7,11 @@ services:
     volumes:
       - /var/lib/postgresql/data
     env_file:
-      - ../backend/.env
+      - .env
 
   backend:
     build:
-      context: ../backend
+      context: .
       dockerfile: Dockerfile
     restart: always
     volumes:
@@ -20,7 +20,7 @@ services:
     depends_on:
       - database
     env_file:
-      - ../backend/.env
+      - .env
 
   nginx:
     image: nginx:1.21.3-alpine
