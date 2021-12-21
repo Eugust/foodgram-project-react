@@ -16,7 +16,7 @@ services:
       - static_value:/backend/static/
       - media_value:/backend/media/
     depends_on:
-      - database
+      - database 
     env_file:
       - ./.env
 
