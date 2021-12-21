@@ -7,10 +7,12 @@ services:
     volumes:
       - /var/lib/postgresql/data
     env_file:
-      - ./.env
+      - ../backend/.env
 
   backend:
-    build: .
+    build:
+      context: ../backend
+      dockerfile: Dockerfile 
     restart: always
     volumes:
       - static_value:/backend/static/
@@ -18,7 +20,7 @@ services:
     depends_on:
       - database 
     env_file:
-      - ./.env
+      - ../backend/.env
 
   frontend:
     build:
@@ -38,6 +40,9 @@ services:
       - ../docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
       - static_value:/var/html/static/
       - media_value:/var/html/media/
+    depends_on:
+      - backend
+      - frontend
 
 volumes:
   postgres_data:
