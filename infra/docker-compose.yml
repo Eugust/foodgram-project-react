@@ -14,7 +14,7 @@ services:
       context: ../backend
       dockerfile: Dockerfile 
     restart: always
-    volumes:
+    volumes: 
       - static_value:/backend/static/
       - media_value:/backend/media/
     depends_on:
