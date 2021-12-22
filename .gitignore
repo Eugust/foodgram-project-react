@@ -131,5 +131,5 @@ dmypy.json
 # .idea
 .idea
 
-# test users data
-test_users_data.txt
+# vscode
+.vscode/

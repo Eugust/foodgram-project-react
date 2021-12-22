@@ -103,15 +103,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if user == recipe.author:
             if request.method == 'POST':
                 serializer = IngredientRecipeSerializer(data=self.request.data)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(
-                        serializer.data,
-                        status=status.HTTP_201_CREATED
-                    )
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
                 return Response(
-                    serializer.errors,
-                    status=status.HTTP_400_BAD_REQUEST
+                    serializer.data,
+                    status=status.HTTP_201_CREATED
                 )
             elif request.method == 'DELETE':
                 ingredient = get_object_or_404(IngredientRecipe, recipe=recipe)

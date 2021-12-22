@@ -1,7 +1,6 @@
 FROM python:3.7-slim
-RUN mkdir /backend
-COPY requirements.txt /backend
-RUN pip3 install -r /backend/requirements.txt
-COPY . /backend
-WORKDIR /backend 
+WORKDIR /backend
+COPY requirements.txt .
+RUN pip3 install -r ./requirements.txt
+COPY . .
 CMD ["gunicorn", "backend.wsgi:application", "--bind", "0:8000"]

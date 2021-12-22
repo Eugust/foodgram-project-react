@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-0e&u%nrox)ro=cry_%r5h2xt8y(qd27mg!)nklgxkcufdwqa#^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '62.84.120.151']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,11 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'colorfield',
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
     'djoser',
+    'colorfield',
     'users',
     'recipes',
     'api',
