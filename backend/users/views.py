@@ -18,6 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
+    permission_classes = [AllowAny, ]
 
     @action(methods=['get'], detail=False,
             url_path='me', url_name='me')
