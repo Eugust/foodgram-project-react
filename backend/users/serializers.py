@@ -59,7 +59,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         read_only=True,
         many=True
     )
-    
+
     class Meta:
         model = User
         fields = (

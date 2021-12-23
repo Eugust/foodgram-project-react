@@ -12,4 +12,4 @@ class Command(BaseCommand):
             reader = csv.reader(f)
             for row in reader:
                 name, unit = row
-                Ingredient.objects.get_or_create(name=name, unit=unit)
+                Ingredient.objects.get_or_create(name=name, measurement_unit=unit)

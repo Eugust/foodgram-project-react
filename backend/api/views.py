@@ -5,13 +5,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import (IsAuthenticated, AllowAny,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.pagination import PageNumberPagination
 from .serializers import (RecipeSerializer, TagSerializer, FavoriteSerializer,
                           IngredientSerializer, FavoriteAndCartSerializer,
                           CartSerializer, IngredientRecipeSerializer)
+from .permissions import IsAuthorOrReadOnly
 from recipes.models import (Recipe, Tag, Favorite,
                             Ingredient, Cart, IngredientRecipe)
 from users.models import User
@@ -21,7 +22,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (IsAuthenticatedOrReadOnly, )
     filter_backends = (DjangoFilterBackend, )
     filterset_fields = ('tags', )
 
@@ -41,18 +41,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
         user = get_object_or_404(User, id=request.user.id)
         all_carts = Cart.objects.filter(user=user).all()
-        ingredients = dict()
-        for cart in all_carts:
-            for ingredient in list(cart.recipe.related_ingredient.all()):
-                if ingredient.ingredient not in ingredients:
-                    ingredients[ingredient.ingredient] = ingredient.value
-                else:
-                    ingredients[ingredient.ingredient] += ingredient.value
+        if all_carts is not None:
+            ingredients = dict()
+            for cart in all_carts:
+                for ingredient in list(cart.recipe.related_ingredient.all()):
+                    if ingredient.ingredient not in ingredients:
+                        ingredients[ingredient.ingredient] = ingredient.value
+                    else:
+                        ingredients[ingredient.ingredient] += ingredient.value
 
-        writer = csv.writer(response)
-        for ingredient, amount in ingredients.items():
-            writer.writerow([f'{ingredient}', f'{amount}'])
-        return response
+            writer = csv.writer(response)
+            for ingredient, amount in ingredients.items():
+                writer.writerow([f'{ingredient}: {amount}'])
+            return response
 
     @action(methods=['get', 'delete'], detail=False,
             url_path=r'(?P<id>\d+)/favorite',
@@ -96,7 +97,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post', 'delete'], detail=False,
             url_path=r'(?P<id>\d+)/add_ingredient',
-            permission_classes=[IsAuthenticated])
+            permission_classes=[IsAuthorOrReadOnly])
     def add_ingredient(self, request, id=None, *args, **kwargs):
         user = get_object_or_404(User, id=request.user.id)
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('id'))
