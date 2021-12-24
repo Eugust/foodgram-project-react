@@ -39,7 +39,7 @@ class UserViewSet(viewsets.ModelViewSet):
         current_password = self.request.data.get('current_password')
         if serializer.is_valid():
             user = get_object_or_404(User, pk=self.request.user.id)
-            if user:
+            if user.check_password(current_password):
                 user.set_password(new_password)
                 user.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -99,7 +99,7 @@ def login(request):
     password = request.data.get('password')
     if serializer.is_valid():
         user = get_object_or_404(User, email=email)
-        if user:
+        if user and user.check_password(password):
             token = Token.objects.create(user=user)
             return Response(
                 {'auth_token': str(token.key)},
