@@ -67,16 +67,19 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
-        related_name='recipes'
+        related_name='recipes',
+        verbose_name='Теги'
     )
     users_in_favorite = models.ManyToManyField(
         User,
         related_name='users_in_favorite',
+        verbose_name='У пользователей в избранном',
         blank=True
     )
     users_in_shopping_cart = models.ManyToManyField(
         User,
         related_name='users_in_shopping_cart',
+        verbose_name='У пользователей в корзине',
         blank=True
     )
 

@@ -32,12 +32,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = Recipe.objects.all()
-        favorite = self.request.query_params.get('is_favorite')
+        favorite = self.request.query_params.get('is_favorited')
         cart = self.request.query_params.get('is_in_shopping_cart')
         if favorite and self.request.user.is_authenticated:
-            qs = qs.filter(users_in_favorite=self.request.user).all()
-        elif cart and self.request.user.is_authenticated:
-            qs = qs.filter(users_in_shopping_cart=self.request.user).all()
+            qs = qs.filter(users_in_favorite=self.request.user)
+        if cart and self.request.user.is_authenticated:
+            qs = qs.filter(users_in_shopping_cart=self.request.user)
         return qs
 
     @action(methods=['get'], detail=False,
@@ -79,11 +79,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
             favorite_serializer.is_valid(raise_exception=True)
             favorite_serializer.save()
+            recipe.users_in_favorite.add(user)
             serializer = FavoriteAndCartSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == 'DELETE':
             favorite = get_object_or_404(Favorite, user=user, recipe=recipe)
             favorite.delete()
+            recipe.users_in_favorite.remove(user)
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -99,11 +101,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
             shop_serializer.is_valid(raise_exception=True)
             shop_serializer.save()
+            recipe.users_in_shopping_cart.add(user)
             serializer = FavoriteAndCartSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == 'DELETE':
             cart = get_object_or_404(Cart, user=user, recipe=recipe)
             cart.delete()
+            recipe.users_in_shopping_cart.remove(user)
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

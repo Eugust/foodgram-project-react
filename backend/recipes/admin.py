@@ -14,12 +14,22 @@ class RecipeTagLine(admin.TabularInline):
     extra = 1
 
 
+class RecipeFavoriteLine(admin.TabularInline):
+    model = Recipe.users_in_favorite.through
+    extra = 1
+
+
+class RecipeCartLine(admin.TabularInline):
+    model = Recipe.users_in_shopping_cart.through
+    extra = 1
+
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('name', 'author')
     list_filter = ('author', 'name', 'tags')
-    inlines = (RecipeIngredientLine, RecipeTagLine, )
-    exclude = ('tags',)
+    inlines = (RecipeIngredientLine, RecipeTagLine, RecipeFavoriteLine, RecipeCartLine, )
+    exclude = ('tags', 'users_in_favorite', 'users_in_shopping_cart')
 
 
 @admin.register(Ingredient)
