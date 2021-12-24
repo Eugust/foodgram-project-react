@@ -71,11 +71,13 @@ class Recipe(models.Model):
     )
     users_in_favorite = models.ManyToManyField(
         User,
-        related_name='users_in_favorite'
+        related_name='users_in_favorite',
+        blank=True
     )
     users_in_shopping_cart = models.ManyToManyField(
         User,
-        related_name='users_in_shopping_cart'
+        related_name='users_in_shopping_cart',
+        blank=True
     )
 
     class Meta:
