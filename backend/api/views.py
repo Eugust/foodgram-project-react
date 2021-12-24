@@ -1,8 +1,9 @@
 import csv
 
 from django.http import HttpResponse
+from django_filters import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
@@ -13,7 +14,7 @@ from .serializers import (RecipeSerializer, TagSerializer, FavoriteSerializer,
                           IngredientSerializer, FavoriteAndCartSerializer,
                           CartSerializer, IngredientRecipeSerializer)
 from .permissions import IsAuthorOrReadOnly
-from .filter import RecipeFilter
+from .filter import RecipeFilter, IngredientFilter
 from recipes.models import (Recipe, Tag, Favorite,
                             Ingredient, Cart, IngredientRecipe)
 from users.models import User
@@ -154,5 +155,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
     pagination_class = None
     permission_classes = [AllowAny, ]
     http_method_names = ['get']
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name',)
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter, )
+    filterset_class = IngredientFilter
+    search_fields = ('^name',)
+    ordering_fields = ('^name',)
