@@ -42,6 +42,7 @@ docker-compose up
 ```
 ## Пример работы приложения
 См. [Страница Foodgram](http://62.84.120.151/signin)
+[Admin](http://62.84.120.151/admin)(username:admin, password:1)
 
 ### Автор
 - Устинов Евгений
