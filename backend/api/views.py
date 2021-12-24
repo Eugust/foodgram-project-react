@@ -154,3 +154,5 @@ class IngredientViewSet(viewsets.ModelViewSet):
     pagination_class = None
     permission_classes = [AllowAny, ]
     http_method_names = ['get']
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('name',)
