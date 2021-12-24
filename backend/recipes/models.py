@@ -69,6 +69,14 @@ class Recipe(models.Model):
         Tag,
         related_name='recipes'
     )
+    users_in_favorite = models.ManyToManyField(
+        User,
+        related_name='users_in_favorite'
+    )
+    users_in_shopping_cart = models.ManyToManyField(
+        User,
+        related_name='users_in_shopping_cart'
+    )
 
     class Meta:
         verbose_name = 'рецепт'

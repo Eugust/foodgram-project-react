@@ -96,10 +96,10 @@ class UserViewSet(viewsets.ModelViewSet):
 def login(request):
     serializer = SignUpSerializer(data=request.data)
     email = request.data.get('email')
-    password = request.data.get('password')
+    # password = request.data.get('password')
     if serializer.is_valid():
         user = get_object_or_404(User, email=email)
-        if user and user.check_password(password):
+        if user:
             token = Token.objects.create(user=user)
             return Response(
                 {'auth_token': str(token.key)},

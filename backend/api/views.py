@@ -5,7 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
-from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated, AllowAny,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.pagination import PageNumberPagination
@@ -13,6 +13,7 @@ from .serializers import (RecipeSerializer, TagSerializer, FavoriteSerializer,
                           IngredientSerializer, FavoriteAndCartSerializer,
                           CartSerializer, IngredientRecipeSerializer)
 from .permissions import IsAuthorOrReadOnly
+from .filter import RecipeFilter
 from recipes.models import (Recipe, Tag, Favorite,
                             Ingredient, Cart, IngredientRecipe)
 from users.models import User
@@ -23,11 +24,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, )
-    filterset_fields = ('tags', )
+    filterset_class = RecipeFilter
     permission_classes = [IsAuthenticatedOrReadOnly, ]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get_queryset(self):
+        qs = Recipe.objects.all()
+        favorite = self.request.query_params.get('is_favorite')
+        cart = self.request.query_params.get('is_in_shopping_cart')
+        if favorite and self.request.user.is_authenticated:
+            qs = qs.filter(users_in_favorite=self.request.user).all()
+        elif cart and self.request.user.is_authenticated:
+            qs = qs.filter(users_in_shopping_cart=self.request.user).all()
+        return qs
 
     @action(methods=['get'], detail=False,
             url_path='download_shopping_cart',
