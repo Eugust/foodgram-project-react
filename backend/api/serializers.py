@@ -1,5 +1,7 @@
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
+from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (Ingredient, Recipe, IngredientRecipe,
                             Tag, Follow, Favorite, Cart)
 from users.serializers import UserSerializer
@@ -67,18 +69,23 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'measurement_unit',
-            'value'
+            'amount'
         )
         model = IngredientRecipe
 
 
-class RecipeSerializer(serializers.ModelSerializer):
+class RecipeReadSerializer(serializers.ModelSerializer):
     tags = TagSerializer(
         read_only=True,
         many=True
     )
     author = UserSerializer(
         read_only=True
+    )
+    image = Base64ImageField(
+        max_length=None,
+        use_url=True,
+        required=False
     )
     ingredients = IngredientRecipeSerializer(
         read_only=True,
@@ -120,6 +127,74 @@ class RecipeSerializer(serializers.ModelSerializer):
         if request and user.is_authenticated:
             return Cart.objects.filter(user=user).exists()
         return False
+
+
+class IngredientRecipeWriteSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=Ingredient.objects.all()
+    )
+
+    class Meta:
+        model = IngredientRecipe
+        fields = ('id', 'amount')
+
+
+class RecipeWriteSerializer(serializers.ModelSerializer):
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True
+    )
+    image = Base64ImageField(
+        max_length=None,
+        use_url=True,
+        required=False
+    )
+    ingredients = serializers.SerializerMethodField(
+        read_only=True
+    )
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'tags',
+            'ingredients',
+            'name',
+            'image',
+            'text',
+            'cooking_time'
+        )
+
+    def get_ingredients(self, obj):
+        serializer_context = {
+            'request': self.context.get('request'),
+            'obj': obj
+        }
+        ingredients = obj.ingredients.all()
+        serializer = IngredientRecipeSerializer(
+            ingredients,
+            many=True,
+            context=serializer_context
+        )
+        return serializer.data
+    '''
+    def create(self, validated_data):
+        author = self.context['request'].user
+        ingredients = validated_data.pop('ingredients')
+        print(ingredients)
+        tags = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data, author=author)
+        for ingredient in ingredients:
+            current_ingredient = Ingredient.objects.get(id=ingredient['id'])
+            IngredientRecipe.objects.create(
+                amount=ingredient['amount'],
+                recipe=recipe,
+                ingredient=current_ingredient
+            )
+        for tag in tags:
+            recipe.tags.add(tag)
+        return recipe
+    '''
 
 
 class FollowSerializer(serializers.ModelSerializer):

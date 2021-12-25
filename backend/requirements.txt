@@ -14,4 +14,5 @@ gunicorn==20.0.4
 psycopg2-binary
 PyJWT==2.1.0
 pytz==2020.1
-sqlparse==0.3.1 
+sqlparse==0.3.1
+drf-extra-fields

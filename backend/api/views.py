@@ -10,9 +10,9 @@ from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated, AllowAny,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.pagination import PageNumberPagination
-from .serializers import (RecipeSerializer, TagSerializer, FavoriteSerializer,
+from .serializers import (RecipeReadSerializer, TagSerializer, FavoriteSerializer,
                           IngredientSerializer, FavoriteAndCartSerializer,
-                          CartSerializer, IngredientRecipeSerializer)
+                          CartSerializer, IngredientRecipeSerializer, RecipeWriteSerializer)
 from .permissions import IsAuthorOrReadOnly
 from .filter import RecipeFilter, IngredientFilter
 from recipes.models import (Recipe, Tag, Favorite,
@@ -22,7 +22,6 @@ from users.models import User
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
@@ -30,6 +29,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get_serializer_class(self):
+        if self.request.method in ['POST', 'PATCH']:
+            return RecipeWriteSerializer
+        return RecipeReadSerializer
 
     def get_queryset(self):
         qs = Recipe.objects.all()
@@ -59,9 +63,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             for cart in all_carts:
                 for ingredient in list(cart.recipe.related_ingredient.all()):
                     if ingredient.ingredient not in ingredients:
-                        ingredients[ingredient.ingredient] = ingredient.value
+                        ingredients[ingredient.ingredient] = ingredient.amount
                     else:
-                        ingredients[ingredient.ingredient] += ingredient.value
+                        ingredients[ingredient.ingredient] += ingredient.amount
 
             writer = csv.writer(response)
             for ingredient, amount in ingredients.items():

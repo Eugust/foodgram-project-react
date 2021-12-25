@@ -102,7 +102,7 @@ class IngredientRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='related_ingredient'
     )
-    value = models.PositiveIntegerField(validators=[MinValueValidator(0)])
+    amount = models.PositiveIntegerField(validators=[MinValueValidator(0)])
 
     class Meta:
         verbose_name = 'ингридиенты для рецепта'
