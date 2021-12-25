@@ -149,8 +149,9 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         use_url=True,
         required=False
     )
-    ingredients = serializers.SerializerMethodField(
-        read_only=True
+    ingredients = IngredientRecipeWriteSerializer(
+        read_only=True,
+        source='related_ingredient'
     )
 
     class Meta:
@@ -164,19 +165,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time'
         )
-
-    def get_ingredients(self, obj):
-        serializer_context = {
-            'request': self.context.get('request'),
-            'obj': obj
-        }
-        ingredients = obj.ingredients.all()
-        serializer = IngredientRecipeSerializer(
-            ingredients,
-            many=True,
-            context=serializer_context
-        )
-        return serializer.data
 
     def create(self, validated_data):
         author = self.context['request'].user
