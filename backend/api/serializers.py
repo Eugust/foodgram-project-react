@@ -150,8 +150,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         required=False
     )
     ingredients = IngredientRecipeWriteSerializer(
-        read_only=True,
-        source='related_ingredient'
+        many=True
     )
 
     class Meta:
