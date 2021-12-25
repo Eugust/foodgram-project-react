@@ -177,7 +177,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             context=serializer_context
         )
         return serializer.data
-    '''
+
     def create(self, validated_data):
         author = self.context['request'].user
         ingredients = validated_data.pop('ingredients')
@@ -194,7 +194,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         for tag in tags:
             recipe.tags.add(tag)
         return recipe
-    '''
 
 
 class FollowSerializer(serializers.ModelSerializer):
