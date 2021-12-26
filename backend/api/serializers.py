@@ -212,6 +212,12 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 ingredient=ingredient['id']
             )
 
+    def to_representation(self, instanse):
+        return RecipeReadSerializer(
+            instanse,
+            context={'request': self.context.get('request')}
+        ).data
+
 
 class FollowSerializer(serializers.ModelSerializer):
     class Meta:
