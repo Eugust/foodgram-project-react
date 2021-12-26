@@ -50,7 +50,7 @@ class UserViewSet(viewsets.ModelViewSet):
             url_path='subscriptions', url_name='subscriptions',
             permission_classes=[IsAuthenticated])
     def subscriptions(self, request, *args, **kwargs):
-        queryset = User.objects.filter(following__user=request.user).all()
+        queryset = User.objects.filter(following__user=request.user)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = SubscribeSerializer(

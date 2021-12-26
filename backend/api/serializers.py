@@ -168,44 +168,46 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'cooking_time'
         )
 
+    def validate_cooking_time(self, value):
+        if value < 1:
+            raise serializers.ValidationError(
+                'Время готовки должно быть больше 0 минут'
+            )
+        return value
+
     def create(self, validated_data):
         author = self.context['request'].user
-        ingredients = validated_data.pop('related_ingredient')
-        tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data, author=author)
-        for ingredient in ingredients:
-            IngredientRecipe.objects.create(
-                amount=ingredient['amount'],
-                recipe=recipe,
-                ingredient=ingredient['id']
-            )
-        for tag in tags:
-            recipe.tags.add(tag)
+        self.add_tags_and_ingredients(
+            validated_data.pop('tags'),
+            validated_data.pop('related_ingredient'),
+            recipe
+        )
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop('related_ingredient')
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)
         instance.cooking_time = validated_data.get(
             'cooking_time',
             instance.cooking_time
         )
-        instance.save()
-        author = self.context['request'].user
-        recipe = Recipe.objects.get(author=author)
-        recipe.related_ingredient.all().delete()
-        tags = validated_data.pop('tags')
+        self.add_tags_and_ingredients(
+            validated_data.pop('tags'),
+            validated_data.pop('related_ingredient'),
+            instance
+        )
+        return instance
+
+    def add_tags_and_ingredients(self, tags, ingredients, recipe):
         recipe.tags.set(tags)
+        IngredientRecipe.objects.filter(recipe=recipe).delete()
         for ingredient in ingredients:
             IngredientRecipe.objects.create(
                 amount=ingredient['amount'],
                 recipe=recipe,
                 ingredient=ingredient['id']
             )
-        recipe.save()
-        return instance
-
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -236,6 +238,7 @@ class CartSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Cart.objects.all(),
-                fields=('user', 'recipe')
+                fields=('user', 'recipe'),
+                message="Вы уже добавили рецепт в корзину"
             )
         ]
