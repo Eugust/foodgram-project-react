@@ -83,17 +83,11 @@ class SubscribeSerializer(serializers.ModelSerializer):
         return False
 
     def get_recipes_count(self, obj):
-        user = self.context['request'].user
-        follow_obj = get_object_or_404(Follow, user=user)
-        author = follow_obj.following
-        recipes_count = Recipe.objects.filter(author=author).count()
+        recipes_count = Recipe.objects.filter(author=obj).count()
         return recipes_count
 
     def get_recipes(self, obj):
-        user = self.context['request'].user
-        follow_obj = get_object_or_404(Follow, user=user)
-        author = follow_obj.following
-        recipes = Recipe.objects.filter(author=author).all()
+        recipes = Recipe.objects.filter(author=obj).all()
         return recipes
 
 
