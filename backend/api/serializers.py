@@ -1,3 +1,4 @@
+from django.db.models.query import InstanceCheckMeta
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
@@ -180,6 +181,30 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         for tag in tags:
             recipe.tags.add(tag)
         return recipe
+
+    def update(self, instance, validated_data):
+        ingredients = validated_data.pop('related_ingredient')
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get(
+            'cooking_time',
+            instance.cooking_time
+        )
+        instance.save()
+        author = self.context['request'].user
+        recipe = Recipe.objects.get(author=author)
+        recipe.related_ingredient.all().delete()
+        tags = validated_data.pop('tags')
+        recipe.tags.set(tags)
+        for ingredient in ingredients:
+            IngredientRecipe.objects.create(
+                amount=ingredient['amount'],
+                recipe=recipe,
+                ingredient=ingredient['id']
+            )
+        recipe.save()
+        return instance
+
 
 
 class FollowSerializer(serializers.ModelSerializer):
