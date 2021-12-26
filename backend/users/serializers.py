@@ -1,9 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from drf_extra_fields.fields import Base64ImageField
 
-from recipes.models import Follow, Recipe
+from recipes.models import Follow
 
 
 User = get_user_model()
@@ -31,64 +29,6 @@ class UserSerializer(serializers.ModelSerializer):
         if request and user.is_authenticated:
             return Follow.objects.filter(user=user).exists()
         return False
-
-
-class RecipeShortInfoSerializer(serializers.ModelSerializer):
-    image = Base64ImageField(
-        max_length=None,
-        use_url=True,
-        required=False
-    )
-
-    class Meta:
-        model = Recipe
-        fields = (
-            'id',
-            'name',
-            'image',
-            'cooking_time'
-        )
-
-
-class SubscribeSerializer(serializers.ModelSerializer):
-    is_subscribed = serializers.SerializerMethodField(
-        read_only=True
-    )
-    recipes_count = serializers.SerializerMethodField(
-        read_only=True
-    )
-    recipes = RecipeShortInfoSerializer(
-        read_only=True,
-        many=True
-    )
-
-    class Meta:
-        model = User
-        fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed',
-            'recipes',
-            'recipes_count'
-        )
-
-    def get_is_subscribed(self, obj):
-        request = self.context['request']
-        user = self.context['request'].user
-        if request and user.is_authenticated:
-            return Follow.objects.filter(user=user).exists()
-        return False
-
-    def get_recipes_count(self, obj):
-        recipes_count = Recipe.objects.filter(author=obj).count()
-        return recipes_count
-
-    def get_recipes(self, obj):
-        recipes = Recipe.objects.filter(author=obj).all()
-        return recipes
 
 
 class SignUpSerializer(serializers.ModelSerializer):

@@ -1,4 +1,4 @@
-from django.db.models.query import InstanceCheckMeta
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
@@ -6,6 +6,9 @@ from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (Ingredient, Recipe, IngredientRecipe,
                             Tag, Follow, Favorite, Cart)
 from users.serializers import UserSerializer
+
+
+User = get_user_model()
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -240,3 +243,44 @@ class CartSerializer(serializers.ModelSerializer):
                 message="Вы уже добавили рецепт в корзину"
             )
         ]
+
+
+class SubscribeSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField(
+        read_only=True
+    )
+    recipes_count = serializers.SerializerMethodField(
+        read_only=True
+    )
+    recipes = FavoriteAndCartSerializer(
+        read_only=True,
+        many=True
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count'
+        )
+
+    def get_is_subscribed(self, obj):
+        request = self.context['request']
+        user = self.context['request'].user
+        if request and user.is_authenticated:
+            return Follow.objects.filter(user=user).exists()
+        return False
+
+    def get_recipes_count(self, obj):
+        recipes_count = Recipe.objects.filter(author=obj).count()
+        return recipes_count
+
+    def get_recipes(self, obj):
+        recipes = Recipe.objects.filter(author=obj).all()
+        return recipes

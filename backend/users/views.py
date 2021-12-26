@@ -8,10 +8,10 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.authtoken.models import Token
 
 from .serializers import (UserSerializer, SignUpSerializer,
-                          SetPasswordSerializer, SubscribeSerializer)
+                          SetPasswordSerializer)
 from .models import User
 from recipes.models import Follow
-from api.serializers import FollowSerializer
+from api.serializers import FollowSerializer, SubscribeSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
