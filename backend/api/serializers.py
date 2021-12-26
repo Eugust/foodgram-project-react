@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
 from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (Ingredient, Recipe, IngredientRecipe,
@@ -35,7 +34,8 @@ class FavoriteSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Favorite.objects.all(),
-                fields=('user', 'recipe')
+                fields=('user', 'recipe'),
+                message='Рецепт уже в избранном'
             )
         ]
 
@@ -194,6 +194,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'cooking_time',
             instance.cooking_time
         )
+        if validated_data.get('image') is not None:
+            instance.image = validated_data.get('image', instance.image)
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('related_ingredient')
         self.add_tags_and_ingredients(tags, ingredients, instance)
