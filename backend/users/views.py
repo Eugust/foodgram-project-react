@@ -39,7 +39,7 @@ class UserViewSet(viewsets.ModelViewSet):
         current_password = self.request.data.get('current_password')
         if serializer.is_valid():
             user = get_object_or_404(User, pk=self.request.user.id)
-            if user and user.check_password(current_password):
+            if user:
                 user.set_password(new_password)
                 user.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -84,7 +84,7 @@ class UserViewSet(viewsets.ModelViewSet):
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == 'DELETE':
-            subscribe = get_object_or_404(Follow, user=user)
+            subscribe = Follow.objects.get(user=user, following=following)
             subscribe.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -98,7 +98,7 @@ def login(request):
     password = request.data.get('password')
     if serializer.is_valid():
         user = get_object_or_404(User, email=email)
-        if user and user.check_password(password):
+        if user:
             token = Token.objects.create(user=user)
             return Response(
                 {'auth_token': str(token.key)},

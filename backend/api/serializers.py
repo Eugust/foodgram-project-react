@@ -281,8 +281,9 @@ class SubscribeSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         request = self.context['request']
         user = self.context['request'].user
+        print(Follow.objects.filter(user=user, following=obj))
         if request and user.is_authenticated:
-            return Follow.objects.filter(user=user).exists()
+            return Follow.objects.filter(user=user, following=obj).exists()
         return False
 
     def get_recipes_count(self, obj):
