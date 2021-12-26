@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from drf_extra_fields.fields import Base64ImageField
 
 from recipes.models import Follow, Recipe
 
@@ -33,7 +34,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class RecipeShortInfoSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField('get_image')
+    image = Base64ImageField(
+        max_length=None,
+        use_url=True,
+        required=False
+    )
 
     class Meta:
         model = Recipe
@@ -43,9 +48,6 @@ class RecipeShortInfoSerializer(serializers.ModelSerializer):
             'image',
             'cooking_time'
         )
-
-    def get_image(self, obj):
-        return obj.image.url
 
 
 class SubscribeSerializer(serializers.ModelSerializer):

@@ -38,7 +38,11 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 
 class FavoriteAndCartSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField('get_image')
+    image = Base64ImageField(
+        max_length=None,
+        use_url=True,
+        required=False
+    )
 
     class Meta:
         model = Recipe
@@ -48,9 +52,6 @@ class FavoriteAndCartSerializer(serializers.ModelSerializer):
             'image',
             'cooking_time'
         )
-
-    def get_image(self, obj):
-        return obj.image.url
 
 
 class IngredientRecipeSerializer(serializers.ModelSerializer):
@@ -119,14 +120,14 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         request = self.context['request']
         user = self.context['request'].user
         if request and user.is_authenticated:
-            return Favorite.objects.filter(user=user).exists()
+            return Favorite.objects.filter(user=user, recipe=obj).exists()
         return False
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context['request']
         user = self.context['request'].user
         if request and user.is_authenticated:
-            return Cart.objects.filter(user=user).exists()
+            return Cart.objects.filter(user=user, recipe=obj).exists()
         return False
 
 
