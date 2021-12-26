@@ -200,7 +200,9 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return instance
 
     def add_tags_and_ingredients(self, tags, ingredients, recipe):
-        recipe.tags.set(tags)
+        recipe.tags.all().delete()
+        for tag in tags:
+            recipe.tags.add(tag)
         IngredientRecipe.objects.filter(recipe=recipe).delete()
         for ingredient in ingredients:
             IngredientRecipe.objects.create(
