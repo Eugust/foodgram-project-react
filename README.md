@@ -1,5 +1,4 @@
 # Приложение Foodgram
-[![Django-app workflow](https://github.com/Eugust/foodgram-project-react/actions/workflows/main.yml/badge.svg)](https://github.com/Eugust/foodgram-project-react/actions/workflows/main.yml)
 
 ## Описание
 Приложение Foodgram - это социальная сеть, в которой пользователи могут выкладывать рецепты блюд, 
